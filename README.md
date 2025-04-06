@@ -10,6 +10,6 @@ More coming soon. Stay tuned! 👀
 
 ![image](https://github.com/user-attachments/assets/692cc850-e06b-425a-8ca6-b24a8176ce6e)
 
-![image](https://github.com/user-attachments/assets/783e1588-6b76-4e08-aa14-3da108b3e74e)
+![image](https://github.com/user-attachments/assets/d4350fda-0cf9-4c86-8e7e-e874a0d21340)
 
-![image](https://github.com/user-attachments/assets/d18ea793-4186-4fe0-82c0-5c06462979ad)
+![image](https://github.com/user-attachments/assets/e169637d-7f9a-4560-ae8c-37ca21d8bed7)
