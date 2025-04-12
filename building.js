@@ -1,41 +1,58 @@
 
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
-import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-class Building {
 
-    constructors(scene, world, position, dimensions, materialProperties, physicsProperties) {
-        this.height = dimensions.height;
-        this.width = dimensions.width;
-        this.depth = dimensions.depth;
+export default class Building {
+    constructor(scene, world, assetPath, position, cylinderCenter) {
+        // loader
+        this.fbxLoader = new FBXLoader();
+        this.scene = scene;
+        this.world = world;
+        this.object = null; 
 
-        // PHYSICS REPRESENTATION
-        // create collision shape
-        this.shape = new CANNON.Box(new CANNON.Vec3(this.width / 2, this.height / 2, this.depth / 2));
-        // create physics body
-        this.body = new CANNON.Body({
-            mass: physicsProperties.mass,
-            position: new CANNON.Vec3(position.x, position.y, position.z),
-            material: physicsProperties.material
-        });
 
-        this.body.addShape(this.shape);
-        world.add(this.body)
+        this.fbxLoader.load(
+            assetPath,
+            (object) => {
+                // add building mesh 
+                object.scale.multiplyScalar(0.5);
+                object.position.set(position.x, position.y, position.z);
+                // object.rotation.x = THREE.MathUtils.degToRad(55);
 
-        // VISUAL REPRESENTATION
-        this.geometery = new THREE.BoxGeometry(dimensions.height, dimensions.widht, dimensions.depth);
-        this.material = new THREE.MeshStandardMaterial(materialProperties);
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = new THREE.Vector3();
 
-        this.mesh = new THREE.Mesh(this.geometery, this.material)
-        this.mesh.position.set(position.x, position.y, position.z);
-        scene.add(this.mesh);
+                const worldCenter = center.clone();
+                object.localToWorld(worldCenter);
 
-        this.update = () => {
-            this.mesh.position.copy(this.body.position);
-            this.mesh.quaternion.copy(this.body.quaternion);
-        }
+                box.getSize(size);
+
+                const cannonOffset = new CANNON.Vec3(
+                    center.x - object.position.x,
+                    center.y - object.position.y,
+                    center.z - object.position.z
+                );
+
+                console.log(object);
+
+
+                this.scene.add(object);
+                // add physics body
+
+                const halfExtents = new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2);
+                const boxShape = new CANNON.Box(halfExtents);
+
+                const body = new CANNON.Body({ mass: 0 });
+                body.addShape(boxShape, cannonOffset);
+
+                // body.rotation.x = THREE.MathUtils.degToRad(55);
+                body.position.set(position.x, position.y, position.z);
+                this.world.addBody(body);
+            }
+        ); 
     }
     
 }

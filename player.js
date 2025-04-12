@@ -32,7 +32,9 @@ export default class Player {
 
         this.playerBody.fixedRotation = true;
         this.playerBody.updateMassProperties();
-        this.playerBody.linearDamping = 0.5;
+        // this.playerBody.linearDamping = 0.5;
+        this.playerBody.linearDamping = 0.05;
+        this.playerBody.angularDamping = 0.05;
 
         // instance variable to keep track of vehicle on which the player is on
         this.currentVehicle = null;
@@ -47,7 +49,7 @@ export default class Player {
         this.moveRight = false;
 
         let canJump = false
-        const jumpVelocity = 20;
+        const jumpVelocity = 30;
 
         // Three.js: create a visual sphere mesh
         const playerGeo = new THREE.SphereGeometry(this.playerRadius, 12, 12);
@@ -184,7 +186,7 @@ export default class Player {
     update(deltaTime) {
 
         const acceleration = 80;
-        const moveSpeed = 90;
+        const moveSpeed = 130;
 
         const inputVelocity = new THREE.Vector3(0, 0, 0);
 
@@ -204,7 +206,6 @@ export default class Player {
         // we get the difference
         // get the desired velocity
         let desiredVel = new CANNON.Vec3(inputVelocity.x, 0, inputVelocity.z);
-
 
         // match player's velocity with that of the vehicle
         if (this.currentVehicle) {

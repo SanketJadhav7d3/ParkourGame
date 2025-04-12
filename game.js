@@ -102,7 +102,7 @@ export default class Game {
         */
 
     this.world = new CANNON.World();
-    this.world.gravity.set(0, -20, 0); // Gravity pulls objects down along Y
+    this.world.gravity.set(0, -50, 0); // Gravity pulls objects down along Y
     // collision detection algorithm
     this.world.broadphase = new CANNON.NaiveBroadphase();
     this.world.solver.iterations = 10;
@@ -172,7 +172,7 @@ export default class Game {
 
     this.player.update(delta);
 
-    this.cannonDebugger.update();
+    // this.cannonDebugger.update();
 
     this.renderer.render(this.scene, this.player.camera);
 

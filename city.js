@@ -44,8 +44,8 @@ class RoadPath {
 
       // to visualize bounding boxes
 
-      // const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00); // Yellow color for the helper.
-      // this.scene.add(boxHelper);
+      const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00); // Yellow color for the helper.
+      this.scene.add(boxHelper);
 
       const { min, max } = boundingBox;
 
@@ -276,6 +276,7 @@ class City {
           }
         }
         */
+
       }
     );
 
@@ -426,7 +427,7 @@ export default class MeshWorld {
 
     // cylinder
 
-    const tunnel = new Tunnel(scene, world);
+    this.tunnel = new Tunnel(scene, world);
 
     this.city = new City(scene, world, 'assets/City model 2.fbx')
 
@@ -456,7 +457,10 @@ export default class MeshWorld {
   }
 
   update(deltaTime) {
+
     this.city.update(deltaTime);
+    this.tunnel.update(deltaTime);
+
     // this.monsterTruck.update(deltaTime);
   }
 }
