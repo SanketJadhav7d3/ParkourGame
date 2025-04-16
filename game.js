@@ -41,7 +41,6 @@ export default class Game {
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.5);
     this.scene.add(ambientLight);
 
-
     const axesHelper = new THREE.AxesHelper(100); 
     this.scene.add(axesHelper);
 
@@ -172,7 +171,7 @@ export default class Game {
 
     this.player.update(delta);
 
-    // this.cannonDebugger.update();
+    this.cannonDebugger.update();
 
     this.renderer.render(this.scene, this.player.camera);
 

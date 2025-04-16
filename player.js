@@ -26,7 +26,7 @@ export default class Player {
 
         this.playerBody = new CANNON.Body({
             mass: this.playerMass, // Dynamic body
-            position: new CANNON.Vec3(499, 3.99, -640),
+            position: new CANNON.Vec3(15, 3, -98),
             // material: this.material,
         });
 
@@ -192,8 +192,8 @@ export default class Player {
 
         if (this.moveForward) inputVelocity.z -= 1;
         if (this.moveBackward) inputVelocity.z += 1;
-        if (this.moveLeft) inputVelocity.x -= 1;
-        if (this.moveRight) inputVelocity.x += 1;
+        if (this.moveLeft) inputVelocity.x -= 0.5;
+        if (this.moveRight) inputVelocity.x += 0.5;
 
         inputVelocity.multiplyScalar(moveSpeed);
 

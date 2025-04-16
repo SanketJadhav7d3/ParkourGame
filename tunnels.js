@@ -4,9 +4,64 @@ import * as CANNON from 'cannon';
 import Building from './building.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
+class Saw {
+    constructor(scene, world, position, revolvingRadius) {
+        this.scene = scene;
+        this.world = world;
+
+        const radiusTop = 20;
+        const radiusBottom = 20;
+        const height = 1;
+        const numSegments = 20;
+        const mass = 0;
+
+        // create cylinder mesh
+        const sawGeo = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, numSegments);
+        const sawMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff});
+
+        this.sawMesh = new THREE.Mesh(sawGeo, sawMaterial);
+        this.scene.add(this.sawMesh);
+
+        this.sawMesh.position.set(position);
+
+        // physics body
+        const cannonShape = new CANNON.Cylinder(radiusTop, radiusBottom, height, numSegments);
+
+        this.cannonBody = new CANNON.Body({ mass });
+        this.cannonBody.addShape(cannonShape);
+
+        const quat = new CANNON.Quaternion();
+        quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);
+        this.cannonBody.quaternion = quat;
+
+        this.cannonBody.position.set(position.x, position.y, position.z);
+        this.world.addBody(this.cannonBody);
+
+        this.sawMesh.userData.physicsBody = this.cannonBody;
+        this.center = position;
+        this.radius = 90;
+
+        this.sawMesh.rotation.x = Math.PI / 2;
+
+        this.angle = 0;
+    }
+
+    update() {
+        this.sawMesh.rotation.y += 0.1;
+
+        this.angle -= 0.04; // Adjust for faster or slower movement
+
+        this.sawMesh.position.x = this.center.x + this.radius * Math.cos(this.angle);
+        this.sawMesh.position.y = this.center.y + this.radius * Math.sin(this.angle);
+        this.sawMesh.position.z = this.center.z;
+
+        this.cannonBody.position.copy(this.sawMesh.position);
+
+        this.cannonBody.quaternion.copy(this.sawMesh.quaternion);
+    }
+}
 
 export default class Tunnel {
-
     constructor(scene, world) {
         this.scene = scene;
         this.world = world;
@@ -39,9 +94,8 @@ export default class Tunnel {
         tubeBody.addShape(tubeShape);
         this.world.addBody(tubeBody);
 
-
         // Tornado cube
-        const CUBE_COUNT = 5000;
+        const CUBE_COUNT = 7000;
         const CUBE_SIZE = 10;
         const RADIUS = 100;
         const HEIGHT = 1000;
@@ -66,35 +120,8 @@ export default class Tunnel {
 
         this.dummy = new THREE.Object3D();
 
-        // load blade
-        this.fbxloader = new FBXLoader();
-        this.sawBlade = null;
-
-        this.fbxloader.load(
-            'assets/sawblade.fbx',
-            (object) => {
-
-                const box = new THREE.Box3().setFromObject(object);
-                const center = box.getCenter(new THREE.Vector3());
-
-                object.position.copy(cylinderMesh.position);
-                object.rotation.y = THREE.MathUtils.degToRad(90)
-
-                const pivot = new THREE.Object3D();
-                scene.add(pivot);
-
-                pivot.add(object);
-
-                object.position.sub(center);
-
-                this.scene.add(object);
-                this.sawBlade = pivot;
-
-                console.log(pivot);
-            }
-        );
-
-
+        // saws
+        this.saw = new Saw(this.scene, this.world, cylinderMesh.position);
     }
 
     update(deltaTime) {
@@ -104,9 +131,11 @@ export default class Tunnel {
 
         for (let i = 0; i < this.cubeStates.length; i++) {
             const s = this.cubeStates[i];
+
             s.angle += s.speed * deltaTime;
             s.y += LIFT_SPEED * deltaTime;
-            if (s.y > HEIGHT / 2) s.y = -HEIGHT / 2;
+
+            if (s.y > HEIGHT / 2) s.y -= HEIGHT;
 
             const x = RADIUS * Math.cos(s.angle);
             const z = RADIUS * Math.sin(s.angle);
@@ -115,14 +144,17 @@ export default class Tunnel {
             this.dummy.scale.set(s.scale, s.scale, s.scale); 
             this.dummy.rotation.y = s.angle;
             this.dummy.updateMatrix();
+
             this.instancedMesh.setMatrixAt(i, this.dummy.matrix);
+
         }
 
         this.instancedMesh.instanceMatrix.needsUpdate = true;
 
-        if (this.sawBlade) {
-            const axis = new THREE.Vector3(1, 0, 0);
-            this.sawBlade.rotateOnAxis(axis, THREE.MathUtils.degToRad(1));
+        if (this.boxHelper) {
+            this.boxHelper.update();
         }
+
+        this.saw.update();
     }
 }
