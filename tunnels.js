@@ -5,7 +5,7 @@ import Building from './building.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
 class Saw {
-    constructor(scene, world, position, revolvingRadius) {
+    constructor(scene, world, tunnelMesh, positionY) {
         this.scene = scene;
         this.world = world;
 
@@ -22,10 +22,12 @@ class Saw {
         this.sawMesh = new THREE.Mesh(sawGeo, sawMaterial);
         this.scene.add(this.sawMesh);
 
-        this.sawMesh.position.set(position);
+        tunnelMesh.add(this.sawMesh);
+
+        this.sawMesh.position.y += positionY;
 
         // physics body
-        const cannonShape = new CANNON.Cylinder(radiusTop, radiusBottom, height, numSegments);
+        const cannonShape = new CANNON.Cylinder(radiusTop, radiusBottom, height, numSegments / 2);
 
         this.cannonBody = new CANNON.Body({ mass });
         this.cannonBody.addShape(cannonShape);
@@ -34,14 +36,13 @@ class Saw {
         quat.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), Math.PI / 2);
         this.cannonBody.quaternion = quat;
 
-        this.cannonBody.position.set(position.x, position.y, position.z);
+        // this.cannonBody.position.set(position.x, position.y, position.z);
         this.world.addBody(this.cannonBody);
 
         this.sawMesh.userData.physicsBody = this.cannonBody;
-        this.center = position;
         this.radius = 90;
 
-        this.sawMesh.rotation.x = Math.PI / 2;
+        // this.sawMesh.rotation.x = Math.PI / 2;
 
         this.angle = 0;
     }
@@ -49,15 +50,25 @@ class Saw {
     update() {
         this.sawMesh.rotation.y += 0.1;
 
-        this.angle -= 0.04; // Adjust for faster or slower movement
+        this.angle += 0.01; // Adjust for faster or slower movement
 
-        this.sawMesh.position.x = this.center.x + this.radius * Math.cos(this.angle);
-        this.sawMesh.position.y = this.center.y + this.radius * Math.sin(this.angle);
-        this.sawMesh.position.z = this.center.z;
+        this.sawMesh.position.x = this.radius * Math.cos(this.angle);
+        this.sawMesh.position.z = this.radius * Math.sin(this.angle);
 
-        this.cannonBody.position.copy(this.sawMesh.position);
+        const meshWorldCoordinates = new THREE.Vector3();
 
-        this.cannonBody.quaternion.copy(this.sawMesh.quaternion);
+        this.sawMesh.localToWorld(meshWorldCoordinates);
+
+        this.cannonBody.position.copy(meshWorldCoordinates);
+
+        const worldPosition = new THREE.Vector3();
+        const worldQuaternion = new THREE.Quaternion();
+        const worldScale = new THREE.Vector3();
+
+        // Decompose the world matrix
+        this.sawMesh.matrixWorld.decompose(worldPosition, worldQuaternion, worldScale)
+
+        this.cannonBody.quaternion.copy(worldQuaternion);
     }
 }
 
@@ -120,14 +131,18 @@ export default class Tunnel {
 
         this.dummy = new THREE.Object3D();
 
+
         // saws
-        this.saw = new Saw(this.scene, this.world, cylinderMesh.position);
+        this.saws = []
+
+        for (let i = -HEIGHT / 2; i < HEIGHT / 2; i+=100)
+            this.saws.push(new Saw(this.scene, this.world, cylinderMesh, i));
     }
 
     update(deltaTime) {
         const RADIUS = 100;
         const HEIGHT = 1000;
-        const LIFT_SPEED = 50;
+        const LIFT_SPEED = 0;
 
         for (let i = 0; i < this.cubeStates.length; i++) {
             const s = this.cubeStates[i];
@@ -155,6 +170,8 @@ export default class Tunnel {
             this.boxHelper.update();
         }
 
-        this.saw.update();
+        this.saws.forEach((saw) => {
+            saw.update();
+        });
     }
 }
