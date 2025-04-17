@@ -4,13 +4,16 @@ import * as CANNON from 'cannon';
 import Building from './building.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
+
 class Saw {
+
     constructor(scene, world, tunnelMesh, positionY) {
         this.scene = scene;
         this.world = world;
+        this.positionY = positionY;
 
-        const radiusTop = 20;
-        const radiusBottom = 20;
+        const radiusTop = 30;
+        const radiusBottom = 30;
         const height = 1;
         const numSegments = 20;
         const mass = 0;
@@ -40,17 +43,17 @@ class Saw {
         this.world.addBody(this.cannonBody);
 
         this.sawMesh.userData.physicsBody = this.cannonBody;
-        this.radius = 90;
+        this.radius = 70;
 
         // this.sawMesh.rotation.x = Math.PI / 2;
 
-        this.angle = 0;
+        this.angle = Math.random() * Math.PI * 2;
     }
 
     update() {
-        this.sawMesh.rotation.y += 0.1;
+        this.sawMesh.rotation.y += 0.4;
 
-        this.angle += 0.01; // Adjust for faster or slower movement
+        this.angle += 0.04; // Adjust for faster or slower movement
 
         this.sawMesh.position.x = this.radius * Math.cos(this.angle);
         this.sawMesh.position.z = this.radius * Math.sin(this.angle);
@@ -70,9 +73,27 @@ class Saw {
 
         this.cannonBody.quaternion.copy(worldQuaternion);
     }
+
+    delete() {
+        this.scene.remove(this.sawMesh);
+        this.world.remove(this.cannonBody);
+
+        return [this.scene, this.world, this.tunnelMesh, this.positionY]
+    }
+
+    static init(scene, world, tunnelMesh, positionY) {
+        return new Saw(scene, world, tunnelMesh, positionY);
+    }
+
+    reset() {
+        const properties = this.delete();
+
+        return Saw.init(...properties);
+    }
 }
 
 export default class Tunnel {
+
     constructor(scene, world) {
         this.scene = scene;
         this.world = world;
@@ -81,29 +102,40 @@ export default class Tunnel {
 
         const cylinderMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
 
-        const cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+        this.cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
-        cylinderMesh.position.set(500, -576, -1500);
+        this.meshPosition = new THREE.Vector3(500, 200, -1300);
 
-        cylinderMesh.rotation.x = THREE.MathUtils.degToRad(65);
+        this.cylinderMesh.position.set(
+            this.meshPosition.x,
+            this.meshPosition.y,
+            this.meshPosition.z
+        );
 
-        cylinderMesh.material.transparent = true;
-        cylinderMesh.material.opacity = 0;
-        this.scene.add(cylinderMesh);
+        this.cylinderMesh.rotation.x = THREE.MathUtils.degToRad(-75);
+
+        this.cylinderMesh.material.transparent = true;
+        this.cylinderMesh.material.opacity = 0;
+
+        this.scene.add(this.cylinderMesh);
 
         const vertices = Array.from(cylinderGeometry.attributes.position.array);
         const indices  = Array.from(cylinderGeometry.index.array);
 
         const tubeShape = new CANNON.Trimesh(vertices, indices);
-        const tubeBody  = new CANNON.Body({ mass: 0 });
+        this.tubeBody  = new CANNON.Body({ mass: 0 });
 
-        tubeBody.position.set(500, -576, -1500);
+        this.tubeBody.position.set(
+            this.meshPosition.x,
+            this.meshPosition.y,
+            this.meshPosition.z
+        );
 
         const axis = new CANNON.Vec3(1, 0, 0); 
-        tubeBody.quaternion.setFromAxisAngle(axis, THREE.MathUtils.degToRad(65));
+        this.tubeBody.quaternion.setFromAxisAngle(axis, THREE.MathUtils.degToRad(-75));
 
-        tubeBody.addShape(tubeShape);
-        this.world.addBody(tubeBody);
+        this.tubeBody.addShape(tubeShape);
+        this.world.addBody(this.tubeBody);
 
         // Tornado cube
         const CUBE_COUNT = 7000;
@@ -117,7 +149,7 @@ export default class Tunnel {
         this.instancedMesh = new THREE.InstancedMesh(cubeGeometry, cubeMaterial, CUBE_COUNT);
         this.instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
-        cylinderMesh.add(this.instancedMesh);
+        this.cylinderMesh.add(this.instancedMesh);
 
         this.cubeStates = [];
         for (let i = 0; i < CUBE_COUNT; i++) {
@@ -131,12 +163,11 @@ export default class Tunnel {
 
         this.dummy = new THREE.Object3D();
 
-
         // saws
         this.saws = []
 
         for (let i = -HEIGHT / 2; i < HEIGHT / 2; i+=100)
-            this.saws.push(new Saw(this.scene, this.world, cylinderMesh, i));
+            this.saws.push(new Saw(this.scene, this.world, this.cylinderMesh, i));
     }
 
     update(deltaTime) {
@@ -161,7 +192,6 @@ export default class Tunnel {
             this.dummy.updateMatrix();
 
             this.instancedMesh.setMatrixAt(i, this.dummy.matrix);
-
         }
 
         this.instancedMesh.instanceMatrix.needsUpdate = true;
@@ -173,5 +203,22 @@ export default class Tunnel {
         this.saws.forEach((saw) => {
             saw.update();
         });
+    }
+
+    delete() {
+        this.scene.remove(this.cylinderMesh);
+
+        this.world.remove(this.tubeBody);
+
+        return [this.scene, this.world];
+    }
+
+    static init(scene, world) {
+        return new Tunnel(scene, world);
+    }
+
+    reset() {
+        this.delete()
+        return Tunnel.init()
     }
 }

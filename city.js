@@ -255,7 +255,6 @@ class City {
 
         this.vehicles = [];
 
-        /*
         for (var i = 0; i < 9; ++i) {
           if (Math.random() > 0.5) {
             this.vehicles.push(new Bus(scene, world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), false));
@@ -275,7 +274,6 @@ class City {
             this.vehicles.push(new Firetruck(scene, world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), true));
           }
         }
-        */
 
       }
     );
@@ -318,8 +316,8 @@ export default class MeshWorld {
   constructor(scene, world) {
 
     this.worldSize = 1500;
-    const gridResolution = 100;
-    const visualResolution = 200;
+    const gridResolution = 11;
+    const visualResolution = 1;
     this.scene = scene;
     this.world = world;
 
@@ -388,7 +386,7 @@ export default class MeshWorld {
     this.heightfieldBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 
     // place groundBody's center at origin
-    this.heightfieldBody.position.set(-this.worldSize / 2, 0, this.worldSize / 2 + 90);
+    this.heightfieldBody.position.set(-this.worldSize / 2, 0, this.worldSize / 2);
 
     // scene.add(this.groundMesh);
 

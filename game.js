@@ -101,7 +101,7 @@ export default class Game {
         */
 
     this.world = new CANNON.World();
-    this.world.gravity.set(0, -50, 0); // Gravity pulls objects down along Y
+    this.world.gravity.set(0, -30, 0); // Gravity pulls objects down along Y
     // collision detection algorithm
     this.world.broadphase = new CANNON.NaiveBroadphase();
     this.world.solver.iterations = 10;
@@ -141,6 +141,15 @@ export default class Game {
     this.meshWorld = new MeshWorld(this.scene, this.world);
 
     this.player.groundBody = this.meshWorld.heightfieldBody;
+
+    // check for collision between player body and mesh world ground body
+    this.player.playerBody.addEventListener("collide", (event) => {
+        // how to reset the world
+        if (event.body === this.meshWorld.heightfieldBody) {
+          console.log("What the hell");
+        }
+    });
+
 
     // this.meshWorld.defineMaterials();
 

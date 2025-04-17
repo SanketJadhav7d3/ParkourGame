@@ -26,7 +26,7 @@ export default class Player {
 
         this.playerBody = new CANNON.Body({
             mass: this.playerMass, // Dynamic body
-            position: new CANNON.Vec3(15, 3, -98),
+            position: new CANNON.Vec3(-4, 50, 689),
             // material: this.material,
         });
 
