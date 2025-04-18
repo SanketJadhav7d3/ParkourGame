@@ -13,6 +13,28 @@
         canvas {
             display: block;
         }
+
+    /* Full-screen semi‑transparent overlay */
+        #pauseOverlay {
+            position: fixed;       
+            top: 0; left: 0;       
+            width: 100%;          
+            height: 100%;          /* Cover full height */
+            background: rgba(0, 0, 0, 0.7); /* Dark overlay */
+            display: none;         /* Hidden until pause */
+            z-index: 9999;         /* Above all scene elements */
+            justify-content: center; /* Center text horizontally */
+            align-items: center;     /* And vertically */
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        /* Inner text styling */
+        #pauseText {
+            line-height: 1.5;
+        }
+
     </style>
     <script async src="https://unpkg.com/es-module-shims@1.7.3/dist/es-module-shims.js"></script>
     <script type="importmap">

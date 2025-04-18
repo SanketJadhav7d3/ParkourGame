@@ -41,7 +41,7 @@ export default class Game {
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.5);
     this.scene.add(ambientLight);
 
-    const axesHelper = new THREE.AxesHelper(100); 
+    const axesHelper = new THREE.AxesHelper(100);
     this.scene.add(axesHelper);
 
     // sky 
@@ -106,8 +106,6 @@ export default class Game {
     this.world.broadphase = new CANNON.NaiveBroadphase();
     this.world.solver.iterations = 10;
 
-    this.clock = new THREE.Clock();
-    this.timeStep = 1 / 60;
 
 
     // debugger
@@ -137,17 +135,27 @@ export default class Game {
     */
 
     this.player = new Player(this.scene, this.world, this.renderer, null);
-
     this.meshWorld = new MeshWorld(this.scene, this.world);
 
     this.player.groundBody = this.meshWorld.heightfieldBody;
 
     // check for collision between player body and mesh world ground body
     this.player.playerBody.addEventListener("collide", (event) => {
-        // how to reset the world
-        if (event.body === this.meshWorld.heightfieldBody) {
-          console.log("What the hell");
-        }
+      // how to reset the world
+      if (event.body === this.meshWorld.heightfieldBody) {
+        console.log("What the hell");
+
+        // remove all the vehicles
+        this.meshWorld.city.deleteVehicles();
+
+        // add all the vehicles
+        this.meshWorld.city.initVehicles();
+
+        // reset player to its starting point
+        this.player.reset();
+
+        this.pause();
+      }
     });
 
 
@@ -167,10 +175,33 @@ export default class Game {
     );
 
     this.composer.addPass(halftonePass);
+
+
+    this.clock = new THREE.Clock();
+    this.timeStep = 1 / 60;
+
+    this.isPaused = false;
+    this.maxSubSteps = 10;
+    this.requestId = null;
+
+    // overlay
+    this.pauseOverlay = document.createElement('div');
+    this.pauseOverlay.id = 'pauseOverlay';
+    this.pauseOverlay.innerHTML = '<div id="pauseText">You died<br>Press [R] to Resume</div>';
+    document.body.appendChild(this.pauseOverlay);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyR' && this.isPaused) {
+        this.resume();
+      }
+    });
   }
 
   animate() {
-    requestAnimationFrame(() => {this.animate()});
+    this.requestId = requestAnimationFrame(() => { this.animate() });
+
+    if (this.isPaused) return;
+
     const delta = this.clock.getDelta();
 
     // Step the physics world
@@ -179,11 +210,32 @@ export default class Game {
     this.meshWorld.update(delta);
 
     this.player.update(delta);
-
     this.cannonDebugger.update();
 
     this.renderer.render(this.scene, this.player.camera);
 
     // this.composer.render();
+  }
+
+  pause() {
+    if (this.isPaused) return;
+
+    this.isPaused = true;
+
+    window.cancelAnimationFrame(this.requestId);
+
+    this.pauseOverlay.style.display = 'flex'; 
+  }
+
+  resume() {
+    if (!this.isPaused) return;
+
+    this.pauseOverlay.style.display = 'none';
+
+    this.isPaused = false;
+
+    this.clock.start();
+
+    this.animate();
   }
 }

@@ -4,7 +4,7 @@ import * as CANNON from 'cannon';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { Ambulance, Limousine, Pickup, Firetruck, Bus, Hatchback, PoliceSport, PoliceSuv, TruckWithTrailer } from './vehicles.js';
+import { Firetruck, Bus } from './vehicles.js';
 import materialsManager from './materialManager.js';
 import materialManager from './materialManager.js';
 import Tunnel from './tunnels.js';
@@ -43,7 +43,6 @@ class RoadPath {
       const boundingBox = new THREE.Box3().setFromObject(mesh);
 
       // to visualize bounding boxes
-
       const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00); // Yellow color for the helper.
       this.scene.add(boxHelper);
 
@@ -252,29 +251,9 @@ class City {
         // this.roadPath.visualizeLanePaths();
 
         // provide a copy of the roadpath lane to the cars as they modify it in a loop
-
         this.vehicles = [];
 
-        for (var i = 0; i < 9; ++i) {
-          if (Math.random() > 0.5) {
-            this.vehicles.push(new Bus(scene, world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), false));
-            this.vehicles.push(new Firetruck(scene, world, this.roadPath.rightLanePath[i], this.roadPath.rightLanePath.slice(i), false));
-          } else {
-            this.vehicles.push(new Bus(scene, world, this.roadPath.rightLanePath[i], this.roadPath.rightLanePath.slice(i), false));
-            this.vehicles.push(new Firetruck(scene, world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), false));
-          }
-        }
-
-        for (var i = 9; i < 12; ++i) {
-          if (Math.random() > 0.5) {
-            this.vehicles.push(new Bus(scene, world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), true));
-            this.vehicles.push(new Firetruck(scene, world, this.roadPath.rightLanePath[i], this.roadPath.rightLanePath.slice(i), true));
-          } else {
-            this.vehicles.push(new Bus(scene, world, this.roadPath.rightLanePath[i], this.roadPath.rightLanePath.slice(i), true));
-            this.vehicles.push(new Firetruck(scene, world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), true));
-          }
-        }
-
+        this.initVehicles();
       }
     );
 
@@ -286,6 +265,62 @@ class City {
     this.createBox({"x": 380, "y": 50, "z": -450}, {"height": 100, "width": 100, "depth": 400});
 
   }
+
+  deleteVehicles() {
+    this.vehicles.forEach((vehicle) => {
+      vehicle.remove();
+    })
+  }
+
+  initVehicles() {
+    for (var i = 0; i < 9; ++i) {
+      if (Math.random() > 0.5) {
+        this.vehicles.push(
+          new Bus(
+            this.scene,
+            this.world,
+            this.roadPath.leftLanePath[i],
+            this.roadPath.leftLanePath.slice(i),
+            false
+          ));
+        this.vehicles.push(
+          new Firetruck(
+            this.scene,
+            this.world,
+            this.roadPath.rightLanePath[i],
+            this.roadPath.rightLanePath.slice(i),
+            false
+          ));
+      } else {
+        this.vehicles.push(
+          new Bus(this.scene,
+            this.world,
+            this.roadPath.rightLanePath[i],
+            this.roadPath.rightLanePath.slice(i),
+            false
+          ));
+        this.vehicles.push(
+          new Firetruck(
+            this.scene,
+            this.world,
+            this.roadPath.leftLanePath[i],
+            this.roadPath.leftLanePath.slice(i),
+            false
+          ));
+      }
+    }
+
+    for (var i = 9; i < 12; ++i) {
+      if (Math.random() > 0.5) {
+        this.vehicles.push(new Bus(this.scene, this.world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), true));
+        this.vehicles.push(new Firetruck(this.scene, this.world, this.roadPath.rightLanePath[i], this.roadPath.rightLanePath.slice(i), true));
+      } else {
+        this.vehicles.push(new Bus(this.scene, this.world, this.roadPath.rightLanePath[i], this.roadPath.rightLanePath.slice(i), true));
+        this.vehicles.push(new Firetruck(this.scene, this.world, this.roadPath.leftLanePath[i], this.roadPath.leftLanePath.slice(i), true));
+      }
+    }
+  }
+
 
   createBox(position, size) {
     var boxShape = new CANNON.Box(new CANNON.Vec3(size.width / 2, size.height / 2, size.depth / 2));
@@ -306,7 +341,6 @@ class City {
         vehicle.update(deltaTime);
       });
     }
-
     // if (this.car6) this.car6.update(deltaTime);
   }
 }
@@ -314,7 +348,6 @@ class City {
 export default class MeshWorld {
 
   constructor(scene, world) {
-
     this.worldSize = 1500;
     const gridResolution = 11;
     const visualResolution = 1;
@@ -461,4 +494,7 @@ export default class MeshWorld {
 
     // this.monsterTruck.update(deltaTime);
   }
+
+
+
 }

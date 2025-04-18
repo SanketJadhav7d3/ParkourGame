@@ -38,7 +38,6 @@ export default class Building {
 
                 console.log(object);
 
-
                 this.scene.add(object);
                 // add physics body
 

@@ -23,10 +23,11 @@ export default class Player {
 
         // Cannon.js: create a dynamic sphere body with non-zero mass
         const playerShape = new CANNON.Sphere(this.playerRadius);
+        this.initPosition = new CANNON.Vec3(-4, 50, 689);
 
         this.playerBody = new CANNON.Body({
             mass: this.playerMass, // Dynamic body
-            position: new CANNON.Vec3(-4, 50, 689),
+            position: this.initPosition,
             // material: this.material,
         });
 
@@ -133,9 +134,6 @@ export default class Player {
             }
         });
 
-
-
-
         document.addEventListener('keydown', (event) => {
             switch (event.code) {
                 case 'KeyW':
@@ -181,6 +179,10 @@ export default class Player {
             this.camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+    }
+
+    reset() {
+        this.playerBody.position.set(this.initPosition.x, this.initPosition.y, this.initPosition.z);
     }
 
     update(deltaTime) {

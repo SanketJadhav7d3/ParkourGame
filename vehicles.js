@@ -42,7 +42,7 @@ class Vehicle {
 
                 // mesh
                 object.scale.multiplyScalar(0.05);
-                object.position.set(this.position.x, this.position.y, this.position.z);
+                object.position.set(this.position.x, this.position.y + 50, this.position.z);
                 scene.add(object);
                 this.object = object;
 
@@ -285,6 +285,48 @@ class Vehicle {
             this.object.position.copy(this.chassisBody.position);
             this.object.quaternion.copy(this.chassisBody.quaternion);
         }
+    }
+
+    remove() {
+        function disposeMesh(mesh) {
+            mesh.traverse(child => {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                    const mats = Array.isArray(child.material)
+                        ? child.material
+                        : [child.material];
+                    mats.forEach(mat => {
+                        for (const key in mat) {
+                            if (mat[key]?.isTexture) mat[key].dispose();
+                        }
+                        mat.dispose();
+                    });
+                }
+            });
+        }
+
+        if (this.object) {
+            this.scene.remove(this.object);
+            disposeMesh(this.object);
+            this.object = null;
+        }
+        this.wheelMeshes.forEach(wheel => {
+            this.scene.remove(wheel);
+            disposeMesh(wheel);
+        });
+        this.wheelMeshes = [];
+
+        if (this.vehicle) {
+            this.vehicle.removeFromWorld(this.world);
+            this.vehicle = null;
+        }
+        if (this.chassisBody) {
+            this.world.removeBody(this.chassisBody);
+            this.chassisBody = null;
+        }
+
+        this.currentTarget = null;
+        this.roadPath = [];
     }
 }
 
