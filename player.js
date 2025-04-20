@@ -5,6 +5,7 @@ import * as CANNON from 'cannon';
 import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import materialManager from './materialManager.js';
+import zoneManager from './zoneManager.js';
 
 
 export default class Player {
@@ -215,7 +216,6 @@ export default class Player {
                 this.currentVehicle.velocity.z
             );
 
-
             desiredVel = desiredVel.vadd(vehicleVel);
         }
 
@@ -225,25 +225,18 @@ export default class Player {
             this.playerBody.velocity.z
         );
 
+        // if out of cityZone
+        if (zoneManager.isZone('cityZone1') && !zoneManager.isMeshInZone(this.playerMesh, 'cityZone1')) {
+            console.log("out of citylevel1")
+            this.playerBody.velocity.y += 2;
+        }
+
         const velDiff = desiredVel.vsub(currentVel)
         const impulse = velDiff.scale(this.playerMass * acceleration * deltaTime);
         this.playerBody.applyImpulse(impulse, this.playerBody.position);
 
-        // this.playerBody.velocity.x += change.x;
-        // this.playerBody.velocity.z += change.z;
+        this.playerMesh.position.copy(this.playerBody.position);
 
-        // this.playerBody.velocity.x = this.velocity.x;
-        // this.playerBody.velocity.z = this.velocity.z;
-
-
-        // Sync the Three.js sphere mesh with the Cannon.js sphere body
-        // this.playerMesh.position.copy(this.playerBody.position);
-
-        // target position with an offset 
-        const targetPosition = new THREE.Vector3().copy(this.playerBody.position).add(new THREE.Vector3(0, 6, -10));
-        const smoothing = 10;
-
-        // this.camera.position.lerp(targetPosition, 1 - Math.exp(-smoothing * deltaTime));
 
         const eyeLevel = new THREE.Vector3(0, 6, 0);
         this.camera.position.copy(this.playerBody.position).add(eyeLevel);

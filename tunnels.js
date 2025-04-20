@@ -26,6 +26,7 @@ class Saw {
         this.sawMesh = new THREE.Mesh(sawGeo, sawMaterial);
         this.scene.add(this.sawMesh);
 
+
         tunnelMesh.add(this.sawMesh);
 
         this.sawMesh.position.y += positionY;
@@ -105,7 +106,7 @@ export default class Tunnel {
 
         this.cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
-        this.meshPosition = new THREE.Vector3(500, 200, -1300);
+        this.meshPosition = new THREE.Vector3(500, 700, -750);
 
         this.cylinderMesh.position.set(
             this.meshPosition.x,
@@ -113,12 +114,16 @@ export default class Tunnel {
             this.meshPosition.z
         );
 
-        this.cylinderMesh.rotation.x = THREE.MathUtils.degToRad(-75);
+        this.cylinderMesh.rotation.x = THREE.MathUtils.degToRad(0);
 
         this.cylinderMesh.material.transparent = true;
         this.cylinderMesh.material.opacity = 0;
 
         this.scene.add(this.cylinderMesh);
+
+        // add mesh to zoneManager
+        zoneManager.createZoneForMesh('tunnelZone', this.cylinderMesh);
+
 
         const vertices = Array.from(cylinderGeometry.attributes.position.array);
         const indices  = Array.from(cylinderGeometry.index.array);
@@ -133,7 +138,7 @@ export default class Tunnel {
         );
 
         const axis = new CANNON.Vec3(1, 0, 0); 
-        this.tubeBody.quaternion.setFromAxisAngle(axis, THREE.MathUtils.degToRad(-75));
+        this.tubeBody.quaternion.setFromAxisAngle(axis, THREE.MathUtils.degToRad(0));
 
         this.tubeBody.addShape(tubeShape);
         this.world.addBody(this.tubeBody);
@@ -174,7 +179,7 @@ export default class Tunnel {
     update(deltaTime) {
         const RADIUS = 100;
         const HEIGHT = 1000;
-        const LIFT_SPEED = 0;
+        const LIFT_SPEED = 100;
 
         for (let i = 0; i < this.cubeStates.length; i++) {
             const s = this.cubeStates[i];

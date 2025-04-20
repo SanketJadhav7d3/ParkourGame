@@ -226,10 +226,7 @@ class City {
         const clonedObject = object.clone();
 
         clonedObject.scale.multiplyScalar(2.5);
-
-
-        clonedObject.position.y -= 200;
-
+        clonedObject.position.y -= 400;
 
         zoneManager.createZoneForMesh('cityZone', clonedObject);
 
@@ -252,6 +249,10 @@ class City {
         this.scene.add(object);
         this.object = object;
 
+        zoneManager.createZoneForMesh('cityZone1', object);
+
+        const boxHelper2 = new THREE.Box3Helper(zoneManager.getZoneByName('cityZone1'), 0xffffff); // Yellow color for the helper.
+        this.scene.add(boxHelper2);
 
         this.object.traverse((child) => {
           if (child.isMesh && !Array.isArray(child.material)) {

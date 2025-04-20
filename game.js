@@ -172,7 +172,6 @@ export default class Game {
 
     this.composer.addPass(halftonePass);
 
-
     this.clock = new THREE.Clock();
     this.timeStep = 1 / 60;
 
@@ -212,7 +211,7 @@ export default class Game {
 
     this.player.update(delta);
 
-    // this.cannonDebugger.update();
+    this.cannonDebugger.update();
 
     this.renderer.render(this.scene, this.player.camera);
 

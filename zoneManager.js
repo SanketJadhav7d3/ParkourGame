@@ -29,8 +29,14 @@ class ZoneManager {
         return this.zones[name];
     }
 
+    isZone(name) {
+        return (name in this.zones);
+    }
+
     isMeshInZone(mesh, name) {
         if (!name in this.zones) return false;
+
+        if (!mesh) return false;
 
         // get bounding box of mesh
         const meshBox = new THREE.Box3().setFromObject(mesh);
