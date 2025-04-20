@@ -8,6 +8,7 @@ import { Firetruck, Bus } from './vehicles.js';
 import materialsManager from './materialManager.js';
 import materialManager from './materialManager.js';
 import Tunnel from './tunnels.js';
+import zoneManager from './zoneManager.js';
 
 
 class RoadPath {
@@ -202,7 +203,6 @@ class RoadPath {
 }
 
 class City {
-
   constructor(scene, world, assetPath) {
     // for a single or multiple buildings or whatever
 
@@ -219,12 +219,31 @@ class City {
     this.fbxLoader.load(
       assetPath,
       (object) => {
+
+        // add object to zone 
+
+        // object.scale.multiplyScalar(2.5);
+        const clonedObject = object.clone();
+
+        clonedObject.scale.multiplyScalar(2.5);
+
+
+        clonedObject.position.y -= 200;
+
+
+        zoneManager.createZoneForMesh('cityZone', clonedObject);
+
+        const boxHelper = new THREE.Box3Helper(zoneManager.getZoneByName('cityZone'), 0xffff00); // Yellow color for the helper.
+        this.scene.add(boxHelper);
+
         object.scale.multiplyScalar(0.5);
 
         // get size
         const box = new THREE.Box3().setFromObject(object);
         const center = box.getCenter(new THREE.Vector3());
         const size = new THREE.Vector3();
+
+        box.getCenter(center)
         box.getSize(size);
 
         // set position
@@ -232,6 +251,7 @@ class City {
 
         this.scene.add(object);
         this.object = object;
+
 
         this.object.traverse((child) => {
           if (child.isMesh && !Array.isArray(child.material)) {
@@ -252,18 +272,19 @@ class City {
 
         // provide a copy of the roadpath lane to the cars as they modify it in a loop
         this.vehicles = [];
+        
+        console.log(this.vehicles, 'hello');
 
         this.initVehicles();
       }
     );
 
-    this.createBox({"x": -100, "y": 50, "z": 300}, {"height": 100, "width": 100, "depth": 900});
-    this.createBox({"x": 100, "y": 50, "z": 360}, {"height": 100, "width": 100, "depth": 800});
-    this.createBox({"x": 130, "y": 50, "z": -210}, {"height": 100, "width": 600, "depth": 100});
-    this.createBox({"x": 340, "y": 50, "z": 10}, {"height": 100, "width": 400, "depth": 100});
-    this.createBox({"x": 600, "y": 50, "z": -300}, {"height": 100, "width": 100, "depth": 700});
-    this.createBox({"x": 380, "y": 50, "z": -450}, {"height": 100, "width": 100, "depth": 400});
-
+    this.createBox({ "x": -100, "y": 50, "z": 300 }, { "height": 100, "width": 100, "depth": 900 });
+    this.createBox({ "x": 100, "y": 50, "z": 360 }, { "height": 100, "width": 100, "depth": 800 });
+    this.createBox({ "x": 130, "y": 50, "z": -210 }, { "height": 100, "width": 600, "depth": 100 });
+    this.createBox({ "x": 340, "y": 50, "z": 10 }, { "height": 100, "width": 400, "depth": 100 });
+    this.createBox({ "x": 600, "y": 50, "z": -300 }, { "height": 100, "width": 100, "depth": 700 });
+    this.createBox({ "x": 380, "y": 50, "z": -450 }, { "height": 100, "width": 100, "depth": 400 });
   }
 
   deleteVehicles() {
@@ -331,6 +352,7 @@ class City {
 
     boxBody.addShape(boxShape);
     boxBody.position.set(position.x, position.y, position.z);
+
     this.world.addBody(boxBody);
   }
 
@@ -338,6 +360,12 @@ class City {
 
     if (this.vehicles) {
       this.vehicles.forEach(vehicle => {
+        // check if car is in zone
+        if (vehicle.object) {
+          if (!zoneManager.isMeshInZone(vehicle.object, 'cityZone')) {
+            vehicle.remove();
+          }
+        }
         vehicle.update(deltaTime);
       });
     }
@@ -494,7 +522,4 @@ export default class MeshWorld {
 
     // this.monsterTruck.update(deltaTime);
   }
-
-
-
 }

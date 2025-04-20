@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import Building from './building.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import zoneManager from './zoneManager.js';
 
 
 class Saw {

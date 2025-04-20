@@ -9,7 +9,6 @@ class MaterialManager {
 
         this.materials = {};
         MaterialManager.instance = this;
-
     }
 
     createMaterial(name, options = {}) {

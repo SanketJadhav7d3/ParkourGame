@@ -148,7 +148,7 @@ export default class Player {
                 case 'KeyD':
                     this.moveRight = true;
                     break;
-                case 'KeyP':
+                case 'KeyG':
                     console.log(this.playerBody.position);
                     break;
             }
@@ -203,8 +203,6 @@ export default class Player {
         moveQuaternion.setFromRotationMatrix(this.controls.object.matrixWorld);
         inputVelocity.applyQuaternion(moveQuaternion);
 
-
-
         // we get the difference
         // get the desired velocity
         let desiredVel = new CANNON.Vec3(inputVelocity.x, 0, inputVelocity.z);
@@ -250,5 +248,4 @@ export default class Player {
         const eyeLevel = new THREE.Vector3(0, 6, 0);
         this.camera.position.copy(this.playerBody.position).add(eyeLevel);
     }
-
 }

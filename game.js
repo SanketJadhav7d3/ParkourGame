@@ -67,8 +67,6 @@ export default class Game {
     const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x4682B4, 0.6);
     this.scene.add(hemisphereLight);
 
-
-
     /*
         const sky = new Sky();
         sky.scale.setScalar(450000);
@@ -106,8 +104,6 @@ export default class Game {
     this.world.broadphase = new CANNON.NaiveBroadphase();
     this.world.solver.iterations = 10;
 
-
-
     // debugger
     this.cannonDebugger = new CannonDebugger(this.scene, this.world);
 
@@ -135,6 +131,7 @@ export default class Game {
     */
 
     this.player = new Player(this.scene, this.world, this.renderer, null);
+
     this.meshWorld = new MeshWorld(this.scene, this.world);
 
     this.player.groundBody = this.meshWorld.heightfieldBody;
@@ -160,7 +157,6 @@ export default class Game {
 
 
     // this.meshWorld.defineMaterials();
-
     this.composer = new EffectComposer(this.renderer);
 
     const renderPass = new RenderPass(this.scene, this.player.camera);
@@ -194,6 +190,11 @@ export default class Game {
       if (e.code === 'KeyR' && this.isPaused) {
         this.resume();
       }
+
+      if (e.code === 'KeyP' && !this.isPaused) {
+        this.pause();
+      }
+
     });
   }
 
@@ -210,7 +211,8 @@ export default class Game {
     this.meshWorld.update(delta);
 
     this.player.update(delta);
-    this.cannonDebugger.update();
+
+    // this.cannonDebugger.update();
 
     this.renderer.render(this.scene, this.player.camera);
 
