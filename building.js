@@ -10,8 +10,7 @@ export default class Building {
         this.fbxLoader = new FBXLoader();
         this.scene = scene;
         this.world = world;
-        this.object = null; 
-
+        this.object = null;
 
         this.fbxLoader.load(
             assetPath,

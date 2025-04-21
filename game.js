@@ -17,6 +17,7 @@ import { HalftonePass } from 'three/addons/postprocessing/HalftonePass.js';
 import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
 import CannonDebugger from './cannonDebugger.js';
 import { Sky } from 'three/addons/objects/Sky.js';
+import CrumblingPlatform from './crumblingPlatform.js';
 
 
 
@@ -140,8 +141,6 @@ export default class Game {
     this.player.playerBody.addEventListener("collide", (event) => {
       // how to reset the world
       if (event.body === this.meshWorld.heightfieldBody) {
-        console.log("What the hell");
-
         // remove all the vehicles
         this.meshWorld.city.deleteVehicles();
 
@@ -155,6 +154,8 @@ export default class Game {
       }
     });
 
+    // crumbling platform
+    const crumblingPlatform = new CrumblingPlatform(this.scene, this.world);
 
     // this.meshWorld.defineMaterials();
     this.composer = new EffectComposer(this.renderer);
@@ -208,6 +209,8 @@ export default class Game {
     this.world.step(this.timeStep, delta);
 
     this.meshWorld.update(delta);
+
+
 
     this.player.update(delta);
 

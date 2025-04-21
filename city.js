@@ -358,7 +358,6 @@ class City {
   }
 
   update(deltaTime) {
-
     if (this.vehicles) {
       this.vehicles.forEach(vehicle => {
         // check if car is in zone
@@ -370,7 +369,6 @@ class City {
         vehicle.update(deltaTime);
       });
     }
-    // if (this.car6) this.car6.update(deltaTime);
   }
 }
 
