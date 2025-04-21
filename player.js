@@ -225,10 +225,13 @@ export default class Player {
             this.playerBody.velocity.z
         );
 
-        // if out of cityZone
-        if (zoneManager.isZone('cityZone1') && !zoneManager.isMeshInZone(this.playerMesh, 'cityZone1')) {
-            console.log("out of citylevel1")
-            this.playerBody.velocity.y += 2;
+        // if player is inside a tunnel
+        if (zoneManager.isZone('tunnelZone') && zoneManager.isMeshInZone(this.playerMesh, 'tunnelZone')) {
+           const impulseMagnitude = this.playerMass * 1;
+            const impulse = new CANNON.Vec3(0, impulseMagnitude, 0);
+            this.playerBody.applyImpulse(impulse, this.playerBody.position);
+        } else {
+            console.log('out of the tunnel');
         }
 
         const velDiff = desiredVel.vsub(currentVel)

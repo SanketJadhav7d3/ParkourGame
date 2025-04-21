@@ -121,8 +121,15 @@ export default class Tunnel {
 
         this.scene.add(this.cylinderMesh);
 
+        // create a coyp of cylinder mesh
+        const clonedCylinderMesh = this.cylinderMesh.clone();
+
+        clonedCylinderMesh.scale.y *= 1.5;
+        
+        // visualize mesh bounding box
+
         // add mesh to zoneManager
-        zoneManager.createZoneForMesh('tunnelZone', this.cylinderMesh);
+        zoneManager.createZoneForMesh('tunnelZone', clonedCylinderMesh);
 
 
         const vertices = Array.from(cylinderGeometry.attributes.position.array);
@@ -172,8 +179,8 @@ export default class Tunnel {
         // saws
         this.saws = []
 
-        for (let i = -HEIGHT / 2; i < HEIGHT / 2; i+=100)
-            this.saws.push(new Saw(this.scene, this.world, this.cylinderMesh, i));
+        //for (let i = -HEIGHT / 2; i < HEIGHT / 2; i+=100)
+            //this.saws.push(new Saw(this.scene, this.world, this.cylinderMesh, i));
     }
 
     update(deltaTime) {
