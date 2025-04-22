@@ -343,7 +343,6 @@ class City {
     }
   }
 
-
   createBox(position, size) {
     var boxShape = new CANNON.Box(new CANNON.Vec3(size.width / 2, size.height / 2, size.depth / 2));
 

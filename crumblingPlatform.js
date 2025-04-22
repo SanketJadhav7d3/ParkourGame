@@ -33,8 +33,18 @@ class CrumblingPlatform {
                 );
 
                 this.scene.add(mesh);
+                this.tiles.push(mesh);
             }
         }
+
+        const boxShape = new CANNON.Box(new CANNON.Vec3(TILE_SIZE / 2, TILE_HEIGHT / 2, TILE_SIZE / 2)); 
+
+        this.tiles.forEach((tile) => {
+            const body = new CANNON.Body({ mass: 0, shape: boxShape });
+            body.position.copy(tile.position);
+            this.world.addBody(body);
+            this.tileBodies.push(body);
+        });
     }
 
     update() {

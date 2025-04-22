@@ -164,10 +164,6 @@ class Vehicle {
         this.brakeMultiplier = 600;
     }
 
-    sortRoadPathPoints() {
-        let referencePoint = new THREE.Vector3(-15.613866635028993, 3.9997699721612987, 772.0978718149253);
-    }
-
     getNearestPoint() {
         let minDistance = Infinity;
         const reachThreshold = 1.0; 
@@ -198,7 +194,7 @@ class Vehicle {
         }
 
         // check if vehicle has reached the point
-        if (this.currentTarget && this.chassisBody.position.distanceTo(this.currentTarget) < 100.0) {
+        if (this.currentTarget && this.chassisBody.position.distanceTo(this.currentTarget) < 80.0) {
             // remove the point 
             const index = this.roadPath.indexOf(this.currentTarget);
 
@@ -248,7 +244,6 @@ class Vehicle {
             
             // apply break as well
             // const brakeStrength = Math.abs(steeringValue) * this.brakeMultiplier;
-
 
             // four wheel drive
             for (let i = 0; i < 4; i++) {
