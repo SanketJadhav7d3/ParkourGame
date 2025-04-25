@@ -14,13 +14,13 @@ class CrumblingPlatform {
         const ROWS = 20;
         const COLS = 20;
 
-        const TILE_SIZE = 50;
+        const TILE_SIZE = 300;
         const TILE_HEIGHT = 10.2;
 
         const tileGeo = new THREE.BoxGeometry(TILE_SIZE, TILE_HEIGHT, TILE_SIZE);
         const tileMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
 
-        const position = new THREE.Vector3(1000, 2000, -1000);
+        const position = new THREE.Vector3(1700, 2100, -4000);
 
         for (let i = 0; i < ROWS; i++) {
             for (let j = 0; j < COLS; j++) {

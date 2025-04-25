@@ -106,7 +106,7 @@ export default class Tunnel {
 
         this.cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
 
-        this.meshPosition = new THREE.Vector3(500, 700, -750);
+        this.meshPosition = new THREE.Vector3(500, 650, -750);
 
         this.cylinderMesh.position.set(
             this.meshPosition.x,
