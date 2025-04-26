@@ -45,7 +45,14 @@ class CrumblingPlatform {
         this.scene.add(this.tilesGroup);
         // create zone for crumbling platform
 
+        const clonedMesh = this.tilesGroup.clone();
+
+        clonedMesh.scale.y *= 1.5;
+
         zoneManager.createZoneForMesh('crumblingPlatformZone', this.tilesGroup);
+
+        const boxHelper = new THREE.Box3Helper(zoneManager.getZoneByName('crumblingPlatformZone'), 0xffff00); // Yellow color for the helper.
+        this.scene.add(boxHelper);
 
         this.hasPhysicsBodies = false;
         

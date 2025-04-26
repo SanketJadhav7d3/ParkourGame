@@ -131,6 +131,9 @@ export default class Tunnel {
         // add mesh to zoneManager
         zoneManager.createZoneForMesh('tunnelZone', clonedCylinderMesh);
 
+        const boxHelper = new THREE.Box3Helper(zoneManager.getZoneByName('tunnelZone'), 0xffff00); // Yellow color for the helper.
+        this.scene.add(boxHelper);
+
 
         const vertices = Array.from(cylinderGeometry.attributes.position.array);
         const indices  = Array.from(cylinderGeometry.index.array);
