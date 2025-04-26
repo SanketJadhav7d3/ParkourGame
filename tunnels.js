@@ -148,7 +148,7 @@ export default class Tunnel {
         this.tubeBody.quaternion.setFromAxisAngle(axis, THREE.MathUtils.degToRad(0));
 
         this.tubeBody.addShape(tubeShape);
-        this.world.addBody(this.tubeBody);
+        // this.world.addBody(this.tubeBody);
 
         // Tornado cube
         const CUBE_COUNT = 7000;

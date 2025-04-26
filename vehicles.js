@@ -21,7 +21,7 @@ class Vehicle {
         this.wheelMeshes = [];
         this.frontWheelIdx = { 'left': null, 'right': null };
         this.roadPath = roadPath;
-        this.radius = 5;
+        this.radius = 2.18;
 
         // target to move towards to 
         this.currentTarget = null;
@@ -112,22 +112,22 @@ class Vehicle {
 
                 object.traverse((child) => {
                     if (child.isMesh && child.name.toLowerCase().includes("wheel")) {
-                        child.geometry.computeBoundingSphere();
-                        const radius = child.geometry.boundingSphere.radius;
 
                         const boundingBox = new THREE.Box3().setFromObject(child);
                         const wheelCenter = new THREE.Vector3();
                         boundingBox.getCenter(wheelCenter);
 
+
                         // local pos where the cylinder wheels are placed are calculated using the relative
                         // position of actual mesh wheel to its parent
                         // however while updating their position the wheelinfos from raycastvehicle uses 
                         // world coordinates whereas the mesh wheels realtive coordinates to update their position
-                        // that's why detach them from parent such that they get updated correctly according to word coordinates 
+                        // that's why detach them from parent such that they get updated correctly according to world coordinates 
 
                         const localPos = wheelCenter.clone().sub(object.position);
 
                         wheelOptions.chassisConnectionPointLocal.copy(localPos);
+
                         this.vehicle.addWheel(wheelOptions);
 
                         this.wheelMeshes.push(child);
@@ -139,6 +139,7 @@ class Vehicle {
 
                     this.object.remove(child);
                     child.scale.multiplyScalar(0.05);
+
                     scene.add(child);
 
                     if (child.name.toLowerCase().includes("front_right"))
@@ -329,7 +330,7 @@ export class Bus extends Vehicle {
     constructor(scene, world, position, roadPath, faceX) {
         const assetPath = 'assets/Free Low Poly Vehicles Pack by Rgsdev/Bus/Bus.fbx'
         super(assetPath, scene, world, position, roadPath, faceX);
-        this.radius = 6;
+        this.radius = 5;
         this.speed = 120;
     }
 }
@@ -338,7 +339,6 @@ export class Firetruck extends Vehicle {
     constructor(scene, world, position, roadPath, faceX) {
         const assetPath = 'assets/Free Low Poly Vehicles Pack by Rgsdev/Firetruck/Firetruck.fbx'
         super(assetPath, scene, world, position, roadPath, faceX);
-        this.speed = 80;
         this.brakeMultiplier = 200;
     }
 }
@@ -354,6 +354,7 @@ export class MonsterTruck extends Vehicle {
     constructor(scene, world, position, roadPath, faceX) {
         const assetPath = 'assets/Free Low Poly Vehicles Pack by Rgsdev/Monster Truck/Monster Truck.fbx'
         super(assetPath, scene, world, position, roadPath, faceX);
+        this.radius = 20;
     }
 }
 
@@ -407,5 +408,3 @@ export class Ambulance extends Vehicle {
         super(assetPath, scene, world, position, roadPath, faceX);
     }
 }
-
-

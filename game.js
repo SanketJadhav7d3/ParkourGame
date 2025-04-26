@@ -18,7 +18,7 @@ import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
 import CannonDebugger from './cannonDebugger.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 import CrumblingPlatform from './crumblingPlatform.js';
-
+import zoneManager from './zoneManager.js';
 
 
 export default class Game {
@@ -85,7 +85,7 @@ export default class Game {
         const phi = 2 * Math.PI * (0.25); // Azimuth
         sun.setFromSphericalCoords(1, theta, phi);
         skyUniforms['sunPosition'].value.copy(sun);
-        */
+    */
 
 
     /*
@@ -97,7 +97,7 @@ export default class Game {
         \_|   |_| |_|\__, |___/_|\___|___/ \____/ \___|\__|\__,_| .__/ 
                     __/ |                                     | |    
                     |___/                                      |_|    
-        */
+    */
 
     this.world = new CANNON.World();
     this.world.gravity.set(0, -30, 0); // Gravity pulls objects down along Y
@@ -117,7 +117,7 @@ export default class Game {
          \____/_|\__|\__, |
                       __/ |
                      |___/ 
-        */
+    */
 
 
     /*
@@ -142,20 +142,20 @@ export default class Game {
       // how to reset the world
       if (event.body === this.meshWorld.heightfieldBody) {
         // remove all the vehicles
-        this.meshWorld.city.deleteVehicles();
+        // this.meshWorld.city.deleteVehicles();
 
         // add all the vehicles
-        this.meshWorld.city.initVehicles();
+        // this.meshWorld.city.initVehicles();
 
         // reset player to its starting point
-        this.player.reset();
+        // this.player.reset();
 
-        this.pause();
+        // this.pause();
       }
     });
 
     // crumbling platform
-    const crumblingPlatform = new CrumblingPlatform(this.scene, this.world);
+    this.crumblingPlatform = new CrumblingPlatform(this.scene, this.world);
 
     // this.meshWorld.defineMaterials();
     this.composer = new EffectComposer(this.renderer);
@@ -208,9 +208,19 @@ export default class Game {
     // Step the physics world
     this.world.step(this.timeStep, delta);
 
-    this.meshWorld.update(delta);
+    // if player not in cityZone
+    if (this.meshWorld && !zoneManager.isMeshInZone(this.player.playerMesh, 'cityZone')) {
+      this.meshWorld.city.deleteCityMesh();
+      this.meshWorld.removeGround();
 
+      // add physics bodies to crumbling platform 
+      // add only once
+      if (!this.crumblingPlatform.hasPhysicsBodies) this.crumblingPlatform.addPhysicsBodies();
 
+    }
+
+    if (this.meshWorld)
+      this.meshWorld.update(delta);
 
     this.player.update(delta);
 

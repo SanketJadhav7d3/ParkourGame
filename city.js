@@ -4,7 +4,7 @@ import * as CANNON from 'cannon';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { Firetruck, Bus } from './vehicles.js';
+import { Firetruck, Bus  } from './vehicles.js';
 import materialsManager from './materialManager.js';
 import materialManager from './materialManager.js';
 import Tunnel from './tunnels.js';
@@ -200,6 +200,12 @@ class RoadPath {
     this.scene.add(new THREE.Points(bufferLeftGeometry, new THREE.PointsMaterial({ color: 0xff0000, size: 3.5 })));
     this.scene.add(new THREE.Points(bufferRightGeometry, new THREE.PointsMaterial({ color: 0xfff000, size: 3.5 })));
   }
+
+  removeMeshes() {
+    this.meshes.forEach((mesh) => {
+      this.scene.remove(mesh);
+    });
+  }
 }
 
 class City {
@@ -212,6 +218,8 @@ class City {
     this.object = null;
 
     this.paths = null;
+
+    this.physicsBodies = [];
 
     // road path
     this.roadPath = new RoadPath(this.scene);
@@ -273,8 +281,6 @@ class City {
 
         // provide a copy of the roadpath lane to the cars as they modify it in a loop
         this.vehicles = [];
-        
-        console.log(this.vehicles, 'hello');
 
         this.initVehicles();
       }
@@ -295,7 +301,7 @@ class City {
   }
 
   initVehicles() {
-    for (var i = 0; i < 9; ++i) {
+    for (var i = 0; i < 8; ++i) {
       if (Math.random() > 0.5) {
         this.vehicles.push(
           new Bus(
@@ -353,6 +359,8 @@ class City {
     boxBody.addShape(boxShape);
     boxBody.position.set(position.x, position.y, position.z);
 
+    this.physicsBodies.push(boxBody);
+
     this.world.addBody(boxBody);
   }
 
@@ -368,6 +376,17 @@ class City {
         vehicle.update(deltaTime);
       });
     }
+  }
+
+  deleteCityMesh() {
+    // remove mesh
+    this.scene.remove(this.object);
+
+    // remove physics bodies
+    // remove building boxes
+    this.physicsBodies.forEach((body) => {
+      this.world.removeBody(body);
+    });
   }
 }
 
@@ -429,7 +448,6 @@ export default class MeshWorld {
 
     this.groundMat = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide });
     this.groundMesh = new THREE.Mesh(this.groundGeo, this.groundMat);
-
 
     // physics
     // heightfield shape
@@ -519,5 +537,9 @@ export default class MeshWorld {
     this.tunnel.update(deltaTime);
 
     // this.monsterTruck.update(deltaTime);
+  }
+
+  removeGround() {
+    this.world.removeBody(this.heightfieldBody);
   }
 }

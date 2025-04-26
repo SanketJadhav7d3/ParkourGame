@@ -51,7 +51,7 @@ export default class Player {
         this.moveRight = false;
 
         let canJump = false
-        const jumpVelocity = 30;
+        const jumpVelocity = 22;
 
         // Three.js: create a visual sphere mesh
         const playerGeo = new THREE.SphereGeometry(this.playerRadius, 12, 12);
@@ -105,7 +105,6 @@ export default class Player {
 
         window.addEventListener('keydown', (event) => {
             if (event.code == 'Space' && (canJump || this.currentVehicle != null)) {
-                console.log('jump');
                 // this.playerBody.velocity.y += jumpSpeed;
                 const impulseMagnitude = this.playerMass * jumpVelocity;
                 const impulse = new CANNON.Vec3(0, impulseMagnitude, 0);
@@ -230,9 +229,7 @@ export default class Player {
            const impulseMagnitude = this.playerMass * 1;
             const impulse = new CANNON.Vec3(0, impulseMagnitude, 0);
             this.playerBody.applyImpulse(impulse, this.playerBody.position);
-        } else {
-            console.log('out of the tunnel');
-        }
+        } 
 
         const velDiff = desiredVel.vsub(currentVel)
         const impulse = velDiff.scale(this.playerMass * acceleration * deltaTime);
