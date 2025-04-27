@@ -39,30 +39,34 @@ export default class Game {
     document.body.appendChild(this.renderer.domElement);
 
     // Add lights for better visibility
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
     this.scene.add(ambientLight);
 
     const axesHelper = new THREE.AxesHelper(100);
     this.scene.add(axesHelper);
 
-    // sky 
-    const sky = new Sky();
-    sky.scale.setScalar(450000);
+    this.accumulatedTime = 0;                 // initialize accumulator
 
-    const phi = THREE.MathUtils.degToRad(90);
+    // sky 
+    this.sky = new Sky();
+    this.sky.scale.setScalar(450000);
+
+    const phi = THREE.MathUtils.degToRad(180);
     const theta = THREE.MathUtils.degToRad(180);
     const sunPosition = new THREE.Vector3().setFromSphericalCoords(1, phi, theta);
 
-    sky.material.uniforms.sunPosition.value = sunPosition;
-    this.scene.add(sky);
+    this.sky.material.uniforms.sunPosition.value = sunPosition;
+
+    this.scene.add(this.sky);
 
     // sunlight
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
-    directionalLight.position.set(1, 1, 1).normalize();
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    this.directionalLight.position.set(1, 1, 1).normalize();
 
     // Assuming sunPosition is defined as in your Sky setup
-    directionalLight.position.copy(sunPosition);
-    this.scene.add(directionalLight);
+    this.directionalLight.position.copy(sunPosition);
+
+    this.scene.add(this.directionalLight);
 
     // hemisphere light
     const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x4682B4, 0.6);
@@ -196,27 +200,105 @@ export default class Game {
       }
 
     });
+
+    this.dayDuration = 50; // seconds for full sunset→night
+
+    const starCount = 10000;
+    const positions = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount; i++) {
+      // spread stars in a sphere of radius 1000
+      const r = 20000;
+      positions[3 * i] = (Math.random() - 0.5) * 2 * r;
+      positions[3 * i + 1] = (Math.random() - 0.5) * 2 * r;
+      positions[3 * i + 2] = (Math.random() - 0.5) * 2 * r;
+    }
+
+    // 2. Build geometry & material
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const starMat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 10.5,
+      sizeAttenuation: true,
+    });
+
+    // 3. Create Points and add to scene
+    const starField = new THREE.Points(starGeo, starMat);
+
+    this.scene.add(starField);
+
+    // add fog
+
+    const horizonColor = new THREE.Color(0xffffff);
+    this.scene.fog = new THREE.Fog(horizonColor, 0, 5000);
+    this.renderer.setClearColor( this.scene.fog.color );
+
+  }
+
+  updateDayNight(t) {
+
+    // interpolate elevation from +90° (sunset horizon) down to -90° (midnight)
+    const phi = THREE.MathUtils.lerp(
+      THREE.MathUtils.degToRad(90),
+      THREE.MathUtils.degToRad(100),
+      t
+    );  // :contentReference[oaicite:0]{index=0}
+
+    const theta = THREE.MathUtils.degToRad(180); // due south
+
+    // recompute sun vector
+    const sunPos = new THREE.Vector3().setFromSphericalCoords(1, phi, theta);
+
+    const sunUni = this.sky.material.uniforms.sunPosition;
+    sunUni.value.copy(sunPos);
+
+    this.directionalLight.position.copy(sunPos);            // :contentReference[oaicite:1]{index=1}
+
+    // fade out light intensity toward night
+    this.directionalLight.intensity = THREE.MathUtils.lerp(0.4, 0.05, t);
+
+    // optional: shift light color toward cooler/moonlight
+    this.directionalLight.color.setHSL(
+      THREE.MathUtils.lerp(0.1, 0.6, t),
+      0.5,
+      THREE.MathUtils.lerp(0.9, 0.3, t)
+    );
+
+    // tweak sky shader parameters
+    this.sky.material.uniforms.turbidity.value = THREE.MathUtils.lerp(10, 2, t);
+    this.sky.material.uniforms.rayleigh.value = THREE.MathUtils.lerp(2, 0.2, t);
+    this.sky.material.uniforms.mieCoefficient.value = THREE.MathUtils.lerp(0.005, 0.0001, t);
   }
 
   animate() {
+
     this.requestId = requestAnimationFrame(() => { this.animate() });
 
     if (this.isPaused) return;
 
     const delta = this.clock.getDelta();
 
+    this.accumulatedTime = (this.accumulatedTime || 0) + delta;
+
+    const t = Math.min(this.accumulatedTime / this.dayDuration, 1);
+
+    if (t < 1) {
+      this.updateDayNight(t);   // interpolate your Sun, lights & sky shader
+    }
+
     // Step the physics world
     this.world.step(this.timeStep, delta);
 
     // if player not in cityZone
     if (this.meshWorld && !zoneManager.isMeshInZone(this.player.playerMesh, 'cityZone')) {
+
       this.meshWorld.city.deleteCityMesh();
       this.meshWorld.removeGround();
 
       // add physics bodies to crumbling platform 
       // add only once
       if (!this.crumblingPlatform.hasPhysicsBodies) this.crumblingPlatform.addPhysicsBodies();
-
     }
 
     if (this.meshWorld)
@@ -227,8 +309,6 @@ export default class Game {
     this.cannonDebugger.update();
 
     this.renderer.render(this.scene, this.player.camera);
-
-    // this.composer.render();
   }
 
   pause() {

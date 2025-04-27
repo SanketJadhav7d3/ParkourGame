@@ -179,6 +179,7 @@ export default class Player {
             this.camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
+
     }
 
     reset() {
@@ -236,7 +237,6 @@ export default class Player {
         this.playerBody.applyImpulse(impulse, this.playerBody.position);
 
         this.playerMesh.position.copy(this.playerBody.position);
-
 
         const eyeLevel = new THREE.Vector3(0, 6, 0);
         this.camera.position.copy(this.playerBody.position).add(eyeLevel);
