@@ -39,7 +39,7 @@ export default class Game {
     document.body.appendChild(this.renderer.domElement);
 
     // Add lights for better visibility
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 8.5);
     this.scene.add(ambientLight);
 
     const axesHelper = new THREE.AxesHelper(100);
@@ -51,6 +51,19 @@ export default class Game {
     this.sky = new Sky();
     this.sky.scale.setScalar(450000);
 
+    const u = this.sky.material.uniforms;
+
+    this.renderer.toneMapping = THREE.LinearToneMapping;
+    this.renderer.toneMappingExposure = 0.26;
+
+    u['turbidity'].value = 2;
+    u['rayleigh'].value = 1;
+    u['mieCoefficient'].value = 0.001;
+    u['mieDirectionalG'].value = 0.6;
+
+
+    if (u['luminance']) u['luminance'].value = 0.5;
+
     const phi = THREE.MathUtils.degToRad(180);
     const theta = THREE.MathUtils.degToRad(180);
     const sunPosition = new THREE.Vector3().setFromSphericalCoords(1, phi, theta);
@@ -60,7 +73,7 @@ export default class Game {
     this.scene.add(this.sky);
 
     // sunlight
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.005);
     this.directionalLight.position.set(1, 1, 1).normalize();
 
     // Assuming sunPosition is defined as in your Sky setup
@@ -69,8 +82,8 @@ export default class Game {
     this.scene.add(this.directionalLight);
 
     // hemisphere light
-    const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x4682B4, 0.6);
-    this.scene.add(hemisphereLight);
+    // const hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x4682B4, 0.2);
+    // this.scene.add(hemisphereLight);
 
     /*
         const sky = new Sky();
@@ -208,7 +221,7 @@ export default class Game {
 
     for (let i = 0; i < starCount; i++) {
       // spread stars in a sphere of radius 1000
-      const r = 20000;
+      const r = 30000;
       positions[3 * i] = (Math.random() - 0.5) * 2 * r;
       positions[3 * i + 1] = (Math.random() - 0.5) * 2 * r;
       positions[3 * i + 2] = (Math.random() - 0.5) * 2 * r;
@@ -219,7 +232,7 @@ export default class Game {
     starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const starMat = new THREE.PointsMaterial({
       color: 0xffffff,
-      size: 10.5,
+      size: 13.5,
       sizeAttenuation: true,
     });
 
@@ -231,7 +244,7 @@ export default class Game {
     // add fog
 
     const horizonColor = new THREE.Color(0xffffff);
-    this.scene.fog = new THREE.Fog(horizonColor, 0, 5000);
+    this.scene.fog = new THREE.Fog(horizonColor, 0, 3000);
     this.renderer.setClearColor( this.scene.fog.color );
 
   }
@@ -240,8 +253,8 @@ export default class Game {
 
     // interpolate elevation from +90° (sunset horizon) down to -90° (midnight)
     const phi = THREE.MathUtils.lerp(
+      THREE.MathUtils.degToRad(-90),
       THREE.MathUtils.degToRad(90),
-      THREE.MathUtils.degToRad(100),
       t
     );  // :contentReference[oaicite:0]{index=0}
 
