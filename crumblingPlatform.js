@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import zoneManager from './zoneManager.js';
+import groundBodies from './groundBodies.js';
 
 
 class CrumblingPlatform {
@@ -66,6 +67,7 @@ class CrumblingPlatform {
             body.position.copy(tile.position);
             this.world.addBody(body);
             this.tileBodies.push(body);
+            groundBodies.addGroundBody(body);
         });
 
         this.hasPhysicsBodies = true;

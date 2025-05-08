@@ -6,6 +6,7 @@ import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.j
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import materialManager from './materialManager.js';
 import zoneManager from './zoneManager.js';
+import groundBodies from './groundBodies.js'; 
 
 
 export default class Player {
@@ -115,7 +116,7 @@ export default class Player {
         });
 
         this.playerBody.addEventListener("collide", (event) => {
-            if (event.body === this.groundBody) {
+            if (groundBodies.bodies.includes(event.body)) {
                 canJump = true;
             } else if (event.body.isVehicle && !this.currentVehicle) {
                 this.currentVehicle = event.body;

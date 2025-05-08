@@ -19,6 +19,7 @@ import CannonDebugger from './cannonDebugger.js';
 import { Sky } from 'three/addons/objects/Sky.js';
 import CrumblingPlatform from './crumblingPlatform.js';
 import zoneManager from './zoneManager.js';
+import groundBodies from './groundBodies.js';
 
 
 export default class Game {
@@ -126,18 +127,6 @@ export default class Game {
     this.cannonDebugger = new CannonDebugger(this.scene, this.world);
 
     /*
-         _____ _ _         
-        /  __ (_) |        
-        | /  \/_| |_ _   _ 
-        | |   | | __| | | |
-        | \__/\ | |_| |_| |
-         \____/_|\__|\__, |
-                      __/ |
-                     |___/ 
-    */
-
-
-    /*
          ___   _                              
         (  _`\(_ )                            
         | |_) )| |    _ _  _   _    __   _ __ 
@@ -151,6 +140,9 @@ export default class Game {
     this.player = new Player(this.scene, this.world, this.renderer, null);
 
     this.meshWorld = new MeshWorld(this.scene, this.world);
+
+    // add height field body
+    groundBodies.addGroundBody(this.meshWorld.heightfieldBody);
 
     this.player.groundBody = this.meshWorld.heightfieldBody;
 
