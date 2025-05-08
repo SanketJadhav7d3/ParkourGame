@@ -65,6 +65,7 @@ class CrumblingPlatform {
         this.tiles.forEach((tile) => {
             const body = new CANNON.Body({ mass: 0, shape: boxShape });
             body.position.copy(tile.position);
+            body.hasFallen = false;
             this.world.addBody(body);
             this.tileBodies.push(body);
             groundBodies.addGroundBody(body);
@@ -73,10 +74,59 @@ class CrumblingPlatform {
         this.hasPhysicsBodies = true;
     }
 
-    update() {
+    update(delta, playerBody) {
+        // use raycast to get tile beneath the player
+
+        const from = new CANNON.Vec3(
+            playerBody.position.x,
+            playerBody.position.y + 4,
+            playerBody.position.z
+        );
+
+        const to = new CANNON.Vec3(
+            playerBody.position.x,
+            playerBody.position.y - 4,
+            playerBody.position.z
+        )
+
+        const ray = new CANNON.Ray(from, to);
+        const result = new CANNON.RaycastResult();
+
+        ray.intersectBodies(this.tileBodies, result);
+
+        if (result.hasHit && !result.hasFallen) {
+            this._scheduleCrumble(result.body);
+        }
+
+        // Sync meshes to bodies
+        for (let i = 0; i < this.tiles.length; i++) {
+            this.tiles[i].position.copy(this.tileBodies[i].position);
+            this.tiles[i].quaternion.copy(this.tileBodies[i].quaternion);
+        }
 
     }
 
+    _scheduleCrumble(body) {
+
+        console.log(body);
+
+        setTimeout(() => {
+            this._crumbleTile(body);
+        }, 500);
+    }
+
+    _crumbleTile(body) {
+
+        body.hasFallen = true;
+        body.mass = 1;
+        body.updateMassProperties();
+        const impulse = new CANNON.Vec3(
+            (Math.random() - 0.5) * 2,
+            0,
+            (Math.random() - 0.5) * 2
+        );
+        body.applyImpulse(impulse, body.position);
+    }
 }
 
 export default CrumblingPlatform;

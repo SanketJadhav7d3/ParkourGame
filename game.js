@@ -304,12 +304,20 @@ export default class Game {
       // add physics bodies to crumbling platform 
       // add only once
       if (!this.crumblingPlatform.hasPhysicsBodies) this.crumblingPlatform.addPhysicsBodies();
+
+      if (this.crumblingPlatform.hasPhysicsBodies) {
+        console.log("Biggest nonsense");
+
+        this.crumblingPlatform.update(delta, this.player.playerBody);
+      }
     }
 
     if (this.meshWorld)
       this.meshWorld.update(delta);
 
     this.player.update(delta);
+
+
 
     this.cannonDebugger.update();
 
