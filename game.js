@@ -306,8 +306,6 @@ export default class Game {
       if (!this.crumblingPlatform.hasPhysicsBodies) this.crumblingPlatform.addPhysicsBodies();
 
       if (this.crumblingPlatform.hasPhysicsBodies) {
-        console.log("Biggest nonsense");
-
         this.crumblingPlatform.update(delta, this.player.playerBody);
       }
     }

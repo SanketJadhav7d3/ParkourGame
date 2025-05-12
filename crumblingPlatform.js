@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon';
 import zoneManager from './zoneManager.js';
 import groundBodies from './groundBodies.js';
+import materialManager from './materialManager.js';
 
 
 class CrumblingPlatform {
@@ -57,10 +58,22 @@ class CrumblingPlatform {
 
         this.hasPhysicsBodies = false;
         
+
+        // create material
+        // materialManager.createContactMaterial('tileMaterial');
+
+        // create contact material
+        //const tileContactMaterial = materialManager.createContactMaterial('tileMaterial', 'tileMaterial', {
+            //friction: 0.1,   // Low friction for sliding behavior
+            //restitution: 0.0
+        //});
+
+        // this.world.addContactMaterial(tileContactMaterial);
     }
 
     addPhysicsBodies() {
         const boxShape = new CANNON.Box(new CANNON.Vec3(this.TILE_SIZE / 2, this.TILE_HEIGHT / 2, this.TILE_SIZE / 2)); 
+
 
         this.tiles.forEach((tile) => {
             const body = new CANNON.Body({ mass: 0, shape: boxShape });
@@ -76,6 +89,7 @@ class CrumblingPlatform {
 
     update(delta, playerBody) {
         // use raycast to get tile beneath the player
+        
 
         const from = new CANNON.Vec3(
             playerBody.position.x,
@@ -94,21 +108,38 @@ class CrumblingPlatform {
 
         ray.intersectBodies(this.tileBodies, result);
 
-        if (result.hasHit && !result.hasFallen) {
+        if (result.hasHit && !result.body.hasFallen) {
+            console.log("has hit", result);
             this._scheduleCrumble(result.body);
         }
 
         // Sync meshes to bodies
         for (let i = 0; i < this.tiles.length; i++) {
-            this.tiles[i].position.copy(this.tileBodies[i].position);
-            this.tiles[i].quaternion.copy(this.tileBodies[i].quaternion);
+            // world coordinates
+            const bodyPosition = this.tileBodies[i].position;
+            const bodyQuaternion = this.tileBodies[i].quaternion;
+
+            const worldPos = new THREE.Vector3(
+                bodyPosition.x,
+                bodyPosition.y,
+                bodyPosition.z
+            );
+
+            const tileMesh  = this.tiles[i];
+            const localPos = tileMesh.parent.worldToLocal(worldPos);
+
+            if (this.tileBodies[i].hasFallen)
+                console.log('fallen', localPos);
+
+
+            tileMesh.position.copy(localPos);
+
+            this.tiles[i].quaternion.copy(bodyQuaternion);
         }
 
     }
 
     _scheduleCrumble(body) {
-
-        console.log(body);
 
         setTimeout(() => {
             this._crumbleTile(body);
@@ -118,13 +149,21 @@ class CrumblingPlatform {
     _crumbleTile(body) {
 
         body.hasFallen = true;
+
         body.mass = 1;
+
+        body.type = CANNON.Body.DYNAMIC;
+
         body.updateMassProperties();
+
+        body.wakeUp();
+
         const impulse = new CANNON.Vec3(
             (Math.random() - 0.5) * 2,
             0,
             (Math.random() - 0.5) * 2
         );
+
         body.applyImpulse(impulse, body.position);
     }
 }
