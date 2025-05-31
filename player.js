@@ -25,7 +25,7 @@ export default class Player {
 
         // Cannon.js: create a dynamic sphere body with non-zero mass
         const playerShape = new CANNON.Sphere(this.playerRadius);
-        this.initPosition = new CANNON.Vec3(-4, 50, 689);
+        this.initPosition = new CANNON.Vec3(-234, 50, 549);
 
         this.playerBody = new CANNON.Body({
             mass: this.playerMass, // Dynamic body
@@ -52,7 +52,7 @@ export default class Player {
         this.moveRight = false;
 
         let canJump = false
-        const jumpVelocity = 22;
+        const jumpVelocity = 28;
 
         // Three.js: create a visual sphere mesh
         const playerGeo = new THREE.SphereGeometry(this.playerRadius, 12, 12);
@@ -228,7 +228,7 @@ export default class Player {
 
         // if player is inside a tunnel
         if (zoneManager.isZone('tunnelZone') && zoneManager.isMeshInZone(this.playerMesh, 'tunnelZone')) {
-           const impulseMagnitude = this.playerMass * 1;
+            const impulseMagnitude = this.playerMass * 1.5;
             const impulse = new CANNON.Vec3(0, impulseMagnitude, 0);
             this.playerBody.applyImpulse(impulse, this.playerBody.position);
         } 

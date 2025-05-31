@@ -210,8 +210,8 @@ class RoadPath {
 
 class City {
   constructor(scene, world, assetPath) {
-    // for a single or multiple buildings or whatever
 
+    // for a single or multiple buildings or whatever
     this.fbxLoader = new FBXLoader();
     this.scene = scene;
     this.world = world;
@@ -286,12 +286,12 @@ class City {
       }
     );
 
-    this.createBox({ "x": -100, "y": 50, "z": 300 }, { "height": 100, "width": 100, "depth": 900 });
-    this.createBox({ "x": 100, "y": 50, "z": 360 }, { "height": 100, "width": 100, "depth": 800 });
-    this.createBox({ "x": 130, "y": 50, "z": -210 }, { "height": 100, "width": 600, "depth": 100 });
-    this.createBox({ "x": 340, "y": 50, "z": 10 }, { "height": 100, "width": 400, "depth": 100 });
-    this.createBox({ "x": 600, "y": 50, "z": -300 }, { "height": 100, "width": 100, "depth": 700 });
-    this.createBox({ "x": 380, "y": 50, "z": -450 }, { "height": 100, "width": 100, "depth": 400 });
+    //this.createBox({ "x": -100, "y": 50, "z": 300 }, { "height": 100, "width": 100, "depth": 900 });
+    //this.createBox({ "x": 100, "y": 50, "z": 360 }, { "height": 100, "width": 100, "depth": 800 });
+    //this.createBox({ "x": 130, "y": 50, "z": -210 }, { "height": 100, "width": 600, "depth": 100 });
+    //this.createBox({ "x": 340, "y": 50, "z": 10 }, { "height": 100, "width": 400, "depth": 100 });
+    //this.createBox({ "x": 600, "y": 50, "z": -300 }, { "height": 100, "width": 100, "depth": 700 });
+    //this.createBox({ "x": 380, "y": 50, "z": -450 }, { "height": 100, "width": 100, "depth": 400 });
   }
 
   deleteVehicles() {
@@ -393,9 +393,9 @@ class City {
 export default class MeshWorld {
 
   constructor(scene, world) {
-    this.worldSize = 1500;
-    const gridResolution = 11;
-    const visualResolution = 1;
+    this.worldSize = 5500;
+    const gridResolution = 15;
+    const visualResolution = 60;
     this.scene = scene;
     this.world = world;
 
@@ -502,9 +502,9 @@ export default class MeshWorld {
 
     // cylinder
 
-    this.tunnel = new Tunnel(scene, world);
+    //this.tunnel = new Tunnel(scene, world);
 
-    this.city = new City(scene, world, 'assets/City model 2.fbx')
+    this.city = new City(scene, world, 'assets/City new.fbx')
 
     // this.monsterTruck = new MonsterTruck(scene, world, {x: 500, y: 30, z: 10});
 
@@ -534,7 +534,7 @@ export default class MeshWorld {
   update(deltaTime) {
 
     this.city.update(deltaTime);
-    this.tunnel.update(deltaTime);
+    //this.tunnel.update(deltaTime);
 
     // this.monsterTruck.update(deltaTime);
   }

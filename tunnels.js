@@ -189,7 +189,7 @@ export default class Tunnel {
     update(deltaTime) {
         const RADIUS = 100;
         const HEIGHT = 1000;
-        const LIFT_SPEED = 100;
+        const LIFT_SPEED = 300;
 
         for (let i = 0; i < this.cubeStates.length; i++) {
             const s = this.cubeStates[i];

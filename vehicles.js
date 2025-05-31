@@ -64,7 +64,7 @@ class Vehicle {
 
 
                 this.chassisBody = new CANNON.Body({
-                    mass: 1000,
+                    mass: 500,
                     material: materialManager.getMaterial('vehicleMaterial')
                 });
 
@@ -161,8 +161,8 @@ class Vehicle {
 
         // vehicular movements
         this.desiredDirection = new THREE.Vector3(1, 0, 0);
-        this.speed = 70;
-        this.brakeMultiplier = 600;
+        this.speed = 60;
+        this.brakeMultiplier = 300;
     }
 
     getNearestPoint() {
@@ -195,7 +195,7 @@ class Vehicle {
         }
 
         // check if vehicle has reached the point
-        if (this.currentTarget && this.chassisBody.position.distanceTo(this.currentTarget) < 80.0) {
+        if (this.currentTarget && this.chassisBody.position.distanceTo(this.currentTarget) < 100.0) {
             // remove the point 
             const index = this.roadPath.indexOf(this.currentTarget);
 
@@ -331,7 +331,7 @@ export class Bus extends Vehicle {
         const assetPath = 'assets/Free Low Poly Vehicles Pack by Rgsdev/Bus/Bus.fbx'
         super(assetPath, scene, world, position, roadPath, faceX);
         this.radius = 5;
-        this.speed = 120;
+        this.speed = 80;
     }
 }
 

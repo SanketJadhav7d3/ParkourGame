@@ -150,7 +150,7 @@ class CrumblingPlatform {
 
         body.hasFallen = true;
 
-        body.mass = 1;
+        body.mass = 0.5;
 
         body.type = CANNON.Body.DYNAMIC;
 

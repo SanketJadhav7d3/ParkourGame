@@ -118,7 +118,7 @@ export default class Game {
     */
 
     this.world = new CANNON.World();
-    this.world.gravity.set(0, -30, 0); // Gravity pulls objects down along Y
+    this.world.gravity.set(0, -32, 0); // Gravity pulls objects down along Y
     // collision detection algorithm
     this.world.broadphase = new CANNON.NaiveBroadphase();
     this.world.solver.iterations = 10;
@@ -164,7 +164,7 @@ export default class Game {
     });
 
     // crumbling platform
-    this.crumblingPlatform = new CrumblingPlatform(this.scene, this.world);
+    //this.crumblingPlatform = new CrumblingPlatform(this.scene, this.world);
 
     // this.meshWorld.defineMaterials();
     this.composer = new EffectComposer(this.renderer);
@@ -202,6 +202,10 @@ export default class Game {
 
       if (e.code === 'KeyP' && !this.isPaused) {
         this.pause();
+      }
+
+      if (e.code === 'keyG') {
+        console.log(this.player.playerBody.position);
       }
 
     });
@@ -297,17 +301,18 @@ export default class Game {
 
     // if player not in cityZone
     if (this.meshWorld && !zoneManager.isMeshInZone(this.player.playerMesh, 'cityZone')) {
-
       this.meshWorld.city.deleteCityMesh();
       this.meshWorld.removeGround();
 
       // add physics bodies to crumbling platform 
       // add only once
+      /*
       if (!this.crumblingPlatform.hasPhysicsBodies) this.crumblingPlatform.addPhysicsBodies();
 
       if (this.crumblingPlatform.hasPhysicsBodies) {
         this.crumblingPlatform.update(delta, this.player.playerBody);
       }
+      */
     }
 
     if (this.meshWorld)
